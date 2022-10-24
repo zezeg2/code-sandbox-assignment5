@@ -44,7 +44,6 @@ export class PodcastsService {
         podcasts,
       };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -61,7 +60,6 @@ export class PodcastsService {
         id,
       };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -83,7 +81,6 @@ export class PodcastsService {
         podcast,
       };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -97,7 +94,6 @@ export class PodcastsService {
       await this.podcastRepository.delete({ id });
       return { ok };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -123,7 +119,6 @@ export class PodcastsService {
       await this.podcastRepository.save(updatedPodcast);
       return { ok };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -139,7 +134,6 @@ export class PodcastsService {
         episodes: podcast.episodes,
       };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -165,7 +159,6 @@ export class PodcastsService {
         episode,
       };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -188,7 +181,6 @@ export class PodcastsService {
         id,
       };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -208,7 +200,6 @@ export class PodcastsService {
       await this.episodeRepository.delete({ id: episode.id });
       return { ok: true };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -230,7 +221,6 @@ export class PodcastsService {
       await this.episodeRepository.save(updatedEpisode);
       return { ok: true };
     } catch (e) {
-      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
