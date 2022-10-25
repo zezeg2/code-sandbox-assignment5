@@ -121,6 +121,7 @@ describe('PodcastService', () => {
     it('should fail if internal server error invoked', async () => {
       podcastRepository.findOne.mockRejectedValue(new Error());
       const result = await service.getPodcast(getPodcastArg);
+      // expect(result).toThrowError();
       expect(result).toEqual({
         ok: false,
         error: 'Internal server error occurred.',
@@ -146,9 +147,18 @@ describe('PodcastService', () => {
         ...podcast,
         ...updatePodcastArgs.payload,
       });
-      const result = await service.updatePodcast(updatePodcastArgs);
+      let result = await service.updatePodcast(updatePodcastArgs);
 
       expect(podcastRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+
+      updatePodcastArgs.payload.rating = null;
+      podcastRepository.save.mockReturnValue({
+        ...podcast,
+        ...updatePodcastArgs.payload,
+      });
+
+      result = await service.updatePodcast(updatePodcastArgs);
       expect(result).toEqual({ ok: true });
     });
 
@@ -169,6 +179,19 @@ describe('PodcastService', () => {
       expect(result).toEqual({
         ok: false,
         error: 'Rating must be between 1 and 5.',
+      });
+    });
+
+    it('should fail if internal server error invoked', async () => {
+      updatePodcastArgs.payload.rating = 3;
+      podcastRepository.findOne.mockReturnValue({ id: 1 });
+      podcastRepository.save.mockRejectedValue(new Error());
+      const result = await service.updatePodcast(updatePodcastArgs);
+
+      expect(podcastRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        ok: false,
+        error: 'Internal server error occurred.',
       });
     });
   });
@@ -278,8 +301,7 @@ describe('PodcastService', () => {
     });
 
     it('should fail if internal server error invoked', async () => {
-      podcastRepository.findOne.mockRejectedValue(podcast);
-
+      podcastRepository.findOne.mockRejectedValue(new Error());
       const result = await service.getEpisodes(getEpisodesArgs);
       expect(podcastRepository.findOne).toHaveBeenCalledTimes(1);
       expect(result).toEqual({
@@ -363,7 +385,9 @@ describe('PodcastService', () => {
     });
 
     it('should fail if internal server error invoked', async () => {
-      podcastRepository.findOne.mockRejectedValue(new Error());
+      podcast.episodes = episodes;
+      podcastRepository.findOne.mockResolvedValue(podcast);
+      episodeRepository.delete.mockRejectedValue(new Error());
       const result = await service.deleteEpisode(deleteEpisodeArgs);
 
       expect(podcastRepository.findOne).toHaveBeenCalledTimes(1);

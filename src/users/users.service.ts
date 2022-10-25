@@ -99,6 +99,8 @@ export class UsersService {
   ): Promise<EditProfileOutput> {
     try {
       const user = await this.users.findOne(userId);
+      // user.email = email ? email : user.email;
+      // user.password = password ? password : user.password;
       if (email) {
         user.email = email;
       }

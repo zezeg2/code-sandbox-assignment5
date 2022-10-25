@@ -5,7 +5,6 @@ import { JwtService } from '../jwt/jwt.service';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
-import * as bcrypt from 'bcrypt';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -203,7 +202,7 @@ describe('UsersService', () => {
         email: 'new-test@mail.com',
         password: 'new-p4ssword',
       });
-      const result = await service.editProfile(
+      let result = await service.editProfile(
         editProfileArgs.userId,
         editProfileArgs.updateValue,
       );
@@ -217,6 +216,19 @@ describe('UsersService', () => {
         email: 'new-test@mail.com',
         password: 'new-p4ssword',
       });
+      expect(result).toEqual({ ok: true });
+
+      editProfileArgs.updateValue.email = null;
+      result = await service.editProfile(
+        editProfileArgs.userId,
+        editProfileArgs.updateValue,
+      );
+      expect(result).toEqual({ ok: true });
+      editProfileArgs.updateValue.password = null;
+      result = await service.editProfile(
+        editProfileArgs.userId,
+        editProfileArgs.updateValue,
+      );
       expect(result).toEqual({ ok: true });
     });
     it('should be fail if internal server error invoked', async () => {

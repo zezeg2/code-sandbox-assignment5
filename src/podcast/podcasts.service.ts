@@ -124,18 +124,14 @@ export class PodcastsService {
   }
 
   async getEpisodes(podcastId: number): Promise<EpisodesOutput> {
-    try {
-      const { podcast, ok, error } = await this.getPodcast(podcastId);
-      if (!ok) {
-        return { ok, error };
-      }
-      return {
-        ok: true,
-        episodes: podcast.episodes,
-      };
-    } catch (e) {
-      return this.InternalServerErrorOutput;
+    const { podcast, ok, error } = await this.getPodcast(podcastId);
+    if (!ok) {
+      return { ok, error };
     }
+    return {
+      ok: true,
+      episodes: podcast.episodes,
+    };
   }
 
   async getEpisode({
@@ -158,9 +154,7 @@ export class PodcastsService {
         ok: true,
         episode,
       };
-    } catch (e) {
-      return this.InternalServerErrorOutput;
-    }
+    } catch (e) {}
   }
 
   async createEpisode({
