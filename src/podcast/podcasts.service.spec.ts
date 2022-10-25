@@ -4,7 +4,6 @@ import { Podcast } from './entities/podcast.entity';
 import { Episode } from './entities/episode.entity';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UpdatePodcastPayload } from './dtos/update-podcast.dto';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -374,5 +373,61 @@ describe('PodcastService', () => {
       });
     });
   });
-  it.todo('updateEpisode');
+  describe('updateEpisode', () => {
+    const rest = {
+      title: 'new-title',
+      category: 'new-category',
+    };
+    const updateEpisodeArgs = {
+      podcastId: 1,
+      episodeId: 1,
+      ...rest,
+    };
+    const episode = {
+      id: 1,
+      title: 'prev-title',
+      category: 'prev-category',
+    };
+    const podcast = {
+      id: 1,
+      episodes: [episode],
+    };
+
+    it('should update episode', async () => {
+      podcastRepository.findOne.mockResolvedValue(podcast);
+      episodeRepository.save.mockResolvedValue({
+        ...episode,
+        ...rest,
+      });
+
+      const result = await service.updateEpisode(updateEpisodeArgs);
+      expect(podcastRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(episodeRepository.save).toHaveBeenCalledTimes(1);
+      expect(episodeRepository.save).toHaveBeenCalledWith({
+        ...episode,
+        ...rest,
+      });
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('should fail if podcast not exists', async () => {
+      podcastRepository.findOne.mockResolvedValue(undefined);
+      const result = await service.updateEpisode(updateEpisodeArgs);
+      expect(result).toEqual(
+        await service.getPodcast(updateEpisodeArgs.podcastId),
+      );
+    });
+
+    it('should fail if internal server error invoked', async () => {
+      podcastRepository.findOne.mockResolvedValue(podcast);
+      episodeRepository.save.mockRejectedValue(new Error());
+      const result = await service.updateEpisode(updateEpisodeArgs);
+
+      expect(podcastRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        ok: false,
+        error: 'Internal server error occurred.',
+      });
+    });
+  });
 });
