@@ -187,22 +187,47 @@ describe('UsersService', () => {
   describe('editProfile', () => {
     const editProfileArgs = {
       userId: 1,
-      updateValue: {
-        email: 'new-test@mail.com',
-        password: 'new-p4ssword',
-      },
+      updateValue: {},
     };
     const user = {
       email: 'test@mail.com',
       password: 'p4ssword',
     };
-    it('should edit profile', async () => {
+    it('should edit email', async () => {
+      editProfileArgs.updateValue = {
+        email: 'new-test@mail.com',
+      };
       userRepository.findOne.mockResolvedValue(user);
       userRepository.save.mockResolvedValue({
         email: 'new-test@mail.com',
+      });
+      const result = await service.editProfile(
+        editProfileArgs.userId,
+        editProfileArgs.updateValue,
+      );
+
+      expect(userRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(userRepository.findOne).toHaveBeenCalledWith(
+        editProfileArgs.userId,
+      );
+      expect(userRepository.save).toHaveBeenCalledTimes(1);
+      expect(userRepository.save).toHaveBeenCalledWith({
+        email: 'new-test@mail.com',
+        password: 'p4ssword',
+      });
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('should edit password', async () => {
+      editProfileArgs.updateValue = {
+        password: 'new-p4ssword',
+      };
+      userRepository.findOne.mockResolvedValue(user);
+      userRepository.save.mockResolvedValue({
+        email: 'test@mail.com',
         password: 'new-p4ssword',
       });
-      let result = await service.editProfile(
+      const result = await service.editProfile(
         editProfileArgs.userId,
         editProfileArgs.updateValue,
       );
@@ -216,19 +241,6 @@ describe('UsersService', () => {
         email: 'new-test@mail.com',
         password: 'new-p4ssword',
       });
-      expect(result).toEqual({ ok: true });
-
-      editProfileArgs.updateValue.email = null;
-      result = await service.editProfile(
-        editProfileArgs.userId,
-        editProfileArgs.updateValue,
-      );
-      expect(result).toEqual({ ok: true });
-      editProfileArgs.updateValue.password = null;
-      result = await service.editProfile(
-        editProfileArgs.userId,
-        editProfileArgs.updateValue,
-      );
       expect(result).toEqual({ ok: true });
     });
     it('should be fail if internal server error invoked', async () => {
